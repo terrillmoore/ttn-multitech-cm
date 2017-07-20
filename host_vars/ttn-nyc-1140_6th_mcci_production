@@ -1,0 +1,22 @@
+---
+
+# Hostname.  Start with ttn-ORG
+hostname: ttn-nyc-1140_6th_mcci_production
+
+# Define this to use an ssh tunnel
+# 0 disables
+# ssh_tunnel_remote_port: 15022
+ssh_tunnel_remote_port: 0
+
+# Actual address or hostname of the gateway.  This can be a hostname
+# or IP address.
+ansible_host: 192.168.25.200
+ansible_port: 22
+
+# Descriptive location of the gateway
+description: NYC gateway at 1140 6th Ave, 10th fl
+
+# Location, use -1 for altitude if not known.
+latitude: 40.75601991152372
+longitude: -73.98285003573824
+altitude: 49
