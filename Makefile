@@ -56,7 +56,7 @@ endif
 HOSTS=$(shell ansible -i ${INVENTORY} --list-hosts ${TARGET} | sed -e 's/^ *//' -e '/^hosts ([0-9]*):/d')
 
 # set the default playbook parameters
-PLAYBOOK_ARGS=-T ${TIMEOUT} -i ${INVENTORY} $${TAGS:+-t $${TAGS}} $${TARGET:+-l $${TARGET}}
+PLAYBOOK_ARGS=-T ${TIMEOUT} -i ${INVENTORY} $${TAGS:+-t $${TAGS}} $${TARGET:+-l $${TARGET}} ${PLAYBOOK_ARGS_USER}
 
 all::	apply
 
