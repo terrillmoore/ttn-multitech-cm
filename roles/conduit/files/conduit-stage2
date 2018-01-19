@@ -16,6 +16,7 @@ function _error {
 }
 
 FIRSTUID=20000
+FIRSTKEEPALIVE=40000
 
 # check that JUMPHOST and JUMPADMIN are set
 if [ X"$JUMPHOST" = X ]; then
@@ -161,7 +162,9 @@ if [ X"$JUMPUID" = X ]; then
 	_error "Can't get JUMPUID"
 fi
 
+KEEPALIVE=$(expr '(' "$JUMPUID" - "$FIRSTUID" ')' '*' 2 + "$FIRSTKEEPALIVE")
 echo "JUMPUID: ${JUMPUID}"
+echo "KEEPALIVE: ${KEEPALIVE}"
 
 # finally, set up the parameters for the ssh setup
 echo "Set up ssh tunnel"
@@ -173,7 +176,7 @@ REMOTE_USER="$MYNAME"
 REMOTE_PORT="$JUMPUID"
 SSH_KEY="$HOME/.ssh/id_${MYNAME}"
 SSH_PORT=22
-DAEMON_ARGS=-"f -M 0 -o ServerAliveInterval=30 -i ${HOME}/.ssh/id_${MYNAME}"
+DAEMON_ARGS="-f -M ${KEEPALIVE} -o ServerAliveInterval=30 -i ${HOME}/.ssh/id_${MYNAME}"
 EOF
 
 chmod 755 /etc/default/ssh_tunnel || _error "can't chmod defaults"
@@ -197,9 +200,10 @@ You can now connect to this gateway using the command:
 
    ssh -tA $JUMPADMIN@$JUMPHOST ssh -A -p $JUMPUID root@localhost
 
-Don't forget to update host_vars/${MYNAME}.yaml to set this value:
+Don't forget to update host_vars/${MYNAME}.yaml to set these values:
 
    ssh_tunnel_remote_port: $JUMPUID
+   ssh_tunnel_keepalive_base_port: $KEEPALIVE
 "
 
 rm -f "$0"
