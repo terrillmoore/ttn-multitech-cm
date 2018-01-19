@@ -3,6 +3,10 @@
 HERE=$(dirname $0)
 TEMPLATES=$HERE/../templates
 
+if [ $# -eq 0 ]; then
+    set -- $HERE/authorized_keys
+fi
+
 #### emit the first part of the file.
 cat << _EOF_
 #!/bin/sh
@@ -30,7 +34,16 @@ cat << 'EOF' > "${HOME}/.ssh/authorized_keys"
 _EOF_
 
 ### insert the authorized keys
-cat $HERE/authorized_keys
+for keyfile in "$@" ; do
+  if [ ! -f "$keyfile" ]; then
+    echo "unable to read: $keyfile" 1>&2
+    exit 1
+  fi
+done
+
+for keyfile in "$@" ; do
+  cat "$keyfile"
+done
 
 ### finish the copy and go on 
 cat << '_EOF_'
