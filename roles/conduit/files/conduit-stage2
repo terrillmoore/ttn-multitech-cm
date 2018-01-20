@@ -149,10 +149,15 @@ ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
 	sudo sh -c \'"cat ~${MYNAME}/.ssh/id_${MYNAME}*.pub >~${MYNAME}/.ssh/authorized_keys"\' || \
 		_error "can't create authorized_keys"
 
-echo "Change ownership of public key"
+echo "Change ownership of authorized_keys"
 ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
 	sudo chown "$MYNAME" "~$MYNAME/.ssh/authorized_keys" || \
 		_error "can't chown authorized_keys"
+
+echo "Change permissions on authorized_keys"
+ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
+	sudo chmod 600 "~$MYNAME/.ssh/authorized_keys" || \
+		_error "can't chmod authorized_keys"
 
 # test that we can now log in
 echo sh -i ".ssh/id_${MYNAME}" -o IdentitiesOnly=yes -p "$JUMPPORT" "$MYNAME"@"$JUMPHOST" true
