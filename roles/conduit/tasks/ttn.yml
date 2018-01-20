@@ -78,6 +78,8 @@
   set_fact:
     gw_key: "{{ gateway_key.stdout }}"
     gw_router: "{{ gateway_info.json|json_query('router.mqtt_address')|urlsplit('hostname') }}"
+  when:
+    - forwarder_variant == 'mp'
 
 #	Remove Multi-Tech stuff that we don't want and install the TTN packet-forwarder
 #
