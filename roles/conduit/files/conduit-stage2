@@ -64,10 +64,6 @@ mlinux_version=$(cat /etc/mlinux-version | sed -n -e '/^mLinux/s/mLinux //p')
 # Fix version in opkg feeds config
 expr ${mlinux_version} : "3.3.[0-9]" && sed -i -e "s%/3.3/%/${mlinux_version}/%" /etc/opkg/mlinux-feed.conf
 
-# Install ansible dependencies
-opkg update || _error "opkg update failed"
-opkg install python-pkgutil python-distutils || _error "opkg installed"
-
 if [ ! -d /var/config/ansible ]; then
 	mkdir -m 755 /var/config/ansible
 fi
@@ -137,13 +133,21 @@ if [ $? -ne 0 ]; then
 fi
 
 # copy public key
-echo "Copy public key"
-scp -P "$JUMPPORT" -p "${HOME}/.ssh/id_${MYNAME}.pub" "$JUMPADMIN"@"$JUMPHOST":/tmp || exit 1;
+echo "Create authorized_keys"
+scp -P "$JUMPPORT" -p "${HOME}/.ssh/id_${MYNAME}.pub" "$JUMPADMIN"@"$JUMPHOST":"~/id_${MYNAME}.pub" || \
+		_error "can't create ~/id_${MYNAME}.pub"
+scp -P "$JUMPPORT" -p /etc/ssh/ssh_host_rsa_key.pub "$JUMPADMIN"@"$JUMPHOST":"~/id_${MYNAME}_host_rsa_key.pub" || \
+		_error "can't create ~/id_${MYNAME}_host_rsa_key.pub"
 
-echo "Move public key"
+echo "Move public keys"
 ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
-	sudo cp "/tmp/id_${MYNAME}.pub" "~$MYNAME/.ssh/authorized_keys" || \
-		_error "can't move id_${MYNAME}.pub"
+	sudo mv "id_${MYNAME}*.pub" "~$MYNAME/.ssh" || \
+		_error "can't move public keys"
+
+echo "Create authorized_keys"
+ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
+	sudo sh -c \'"cat ~${MYNAME}/.ssh/id_${MYNAME}*.pub >~${MYNAME}/.ssh/authorized_keys"\' || \
+		_error "can't create authorized_keys"
 
 echo "Change ownership of public key"
 ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
