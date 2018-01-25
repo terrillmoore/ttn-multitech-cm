@@ -332,7 +332,7 @@ def main():
                        help="Old ID of Gateway to remove")
     group.add_argument("--region",
                        dest="region", required=True,
-		       choices=[ "AU", "EU", "US" ],
+		       choices=[ "AS1", "AS2", "AU", "EU", "IN", "KR", "US" ],
                        help="Frequency region, one of AU, EU, US")
     group.add_argument("--router", "--router-id",
                        dest="router",
