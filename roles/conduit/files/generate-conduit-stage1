@@ -67,8 +67,6 @@ UsePAM no
 PermitEmptyPasswords no
 EOF
 
-/etc/init.d/sshd restart || { echo "failed to restart sshd" 1>&2 ; exit 1; }
-
 ### set device for DHCP
 if [ ! -f /etc/network/interfaces.orig ]; then
 	cp -p /etc/network/interfaces /etc/network/interfaces.orig
@@ -95,6 +93,10 @@ remote test system with ssh. Check the IP address from the ifconfig output
 below...
 '
 ifconfig eth0
+
+echo 'All set: press enter to restart sshd (will run in background)'
+read JUNK
+nohup sh -c '/etc/init.d/sshd restart' >/dev/null 2>&1
 
 exit 0
 _EOF_

@@ -85,9 +85,9 @@ if [ $NEEDKEY -eq 0 ]; then
 		_error "permissions wrong on ${HOME}/.ssh/id_$MYNAME"
 	fi
 else
-	echo "About to generate key; this may take some time"
-	ssh-keygen -f "${HOME}/.ssh/id_$MYNAME" -b 4096 -t rsa -N '' -C "$MYNAME" ||
-		_error "ssh-keygen failed"
+	echo "Using /etc/ssh/ssh_host_rsa_key"
+	cp -p /etc/ssh/ssh_host_rsa_key "${HOME}/.ssh/id_${MYNAME}"
+	cp -p /etc/ssh/ssh_host_rsa_key.pub "${HOME}/.ssh/id_${MYNAME}.pub"
 fi
 
 # create our user
@@ -189,9 +189,9 @@ LOCAL_PORT=22
 REMOTE_HOST="$JUMPHOST"
 REMOTE_USER="$MYNAME"
 REMOTE_PORT="$JUMPUID"
-SSH_KEY="$HOME/.ssh/id_${MYNAME}"
+SSH_KEY="/etc/ssh/ssh_host_rsa_key.pub"
 SSH_PORT=22
-DAEMON_ARGS="-f -M ${KEEPALIVE} -o ServerAliveInterval=30 -i ${HOME}/.ssh/id_${MYNAME}"
+DAEMON_ARGS="-f -M ${KEEPALIVE} -o ServerAliveInterval=30 -i /etc/ssh/ssh_host_rsa_key"
 EOF
 
 chmod 755 /etc/default/ssh_tunnel || _error "can't chmod defaults"
