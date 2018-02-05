@@ -109,8 +109,14 @@ fi
 
 if [ $FOUNDUSER -eq 0 ]; then
 echo "Creating $MYNAME"
-ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
+echo ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
 	sudo useradd --comment "$MYNAME" --password "*" \
+		--gid "${MYGROUP}" \
+		--no-user-group \
+		--create-home \
+		--key UID_MIN="${FIRSTUID}" "$MYNAME"
+ssh -p "$JUMPPORT" "$JUMPADMIN"@"$JUMPHOST" -t \
+	sudo useradd --comment "$MYNAME" --password '\*' \
 		--gid "${MYGROUP}" \
 		--no-user-group \
 		--create-home \
